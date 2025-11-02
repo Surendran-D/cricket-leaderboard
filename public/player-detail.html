@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Details - Cricket Leaderboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏏 Player Statistics</h1>
+            <nav class="nav-buttons">
+                <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Back to Leaderboard</button>
+            </nav>
+        </header>
+
+        <div id="player-profile" class="player-profile">
+            <div class="loading">Loading...</div>
+        </div>
+
+        <!-- Image Upload Section -->
+        <div id="image-upload-section" class="image-upload-section" style="display: none;">
+            <div class="upload-card">
+                <h3>Upload Player Photo</h3>
+                <div class="upload-area">
+                    <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    <label for="image-upload" class="upload-label">
+                        <span class="upload-icon">📷</span>
+                        <span>Click to upload image</span>
+                        <small>JPG, PNG or GIF (max 5MB)</small>
+                    </label>
+                </div>
+                <div id="upload-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span id="progress-text">Uploading...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-sections">
+            <div class="stats-section">
+                <h2>🏏 Batting Statistics</h2>
+                <div class="totals-card">
+                    <div class="total-stat">
+                        <span class="stat-label">Total Runs</span>
+                        <span class="stat-value" id="total-runs">0</span>
+                    </div>
+                    <div class="total-stat">
+                        <span class="stat-label">Total Points</span>
+                        <span class="stat-value" id="batting-points">0</span>
+                    </div>
+                    <div class="total-stat">
+                        <span class="stat-label">Matches</span>
+                        <span class="stat-value" id="batting-matches">0</span>
+                    </div>
+                    <div class="total-stat">
+                        <span class="stat-label">Fours</span>
+                        <span class="stat-value" id="total-fours">0</span>
+                    </div>
+                    <div class="total-stat">
+                        <span class="stat-label">Sixes</span>
+                        <span class="stat-value" id="total-sixes">0</span>
+                    </div>
+                </div>
+                <div id="batting-history" class="history-table">
+                    <!-- Batting history will be loaded here -->
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h2>🎯 Bowling Statistics</h2>
+                <div class="totals-card">
+                    <div class="total-stat">
+                        <span class="stat-label">Total Wickets</span>
+                        <span class="stat-value" id="total-wickets">0</span>
+                    </div>
+                    <div class="total-stat">
+                        <span class="stat-label">Total Points</span>
+                        <span class="stat-value" id="bowling-points">0</span>
+                    </div>
+                    <div class="total-stat">
+                        <span class="stat-label">Matches</span>
+                        <span class="stat-value" id="bowling-matches">0</span>
+                    </div>
+                    <div class="total-stat">
+                        <span class="stat-label">Overs</span>
+                        <span class="stat-value" id="total-overs">0</span>
+                    </div>
+                    <div class="total-stat">
+                        <span class="stat-label">Runs Conceded</span>
+                        <span class="stat-value" id="total-runs-conceded">0</span>
+                    </div>
+                </div>
+                <div id="bowling-history" class="history-table">
+                    <!-- Bowling history will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/player-detail.js"></script>
+</body>
+</html>
+

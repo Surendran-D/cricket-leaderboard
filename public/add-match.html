@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add/Edit Match - Cricket Leaderboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏏 Match Details</h1>
+            <nav class="nav-buttons">
+                <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Leaderboard</button>
+                <button class="btn btn-secondary" onclick="window.location.href='matches.html'">Matches List</button>
+            </nav>
+        </header>
+
+        <div class="form-container">
+            <form id="match-form">
+                <input type="hidden" id="match-id" name="match-id">
+                
+                <div class="form-group">
+                    <label for="match-date">Match Date *</label>
+                    <input type="date" id="match-date" name="match-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="match-name">Match Name</label>
+                    <input type="text" id="match-name" name="match-name" placeholder="e.g., Sunday Match 1">
+                </div>
+
+                <div class="form-section">
+                    <div class="section-header">
+                        <h3>Batting Stats</h3>
+                        <button type="button" class="btn btn-secondary" onclick="showAddPlayerModal()">+ Add New Player</button>
+                    </div>
+                    <button type="button" class="btn btn-add" onclick="addBattingPlayer()">+ Add Player</button>
+                    <div id="batting-stats-container"></div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-header">
+                        <h3>Bowling Stats</h3>
+                        <button type="button" class="btn btn-secondary" onclick="showAddPlayerModal()">+ Add New Player</button>
+                    </div>
+                    <button type="button" class="btn btn-add" onclick="addBowlingPlayer()">+ Add Player</button>
+                    <div id="bowling-stats-container"></div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Match</button>
+                    <button type="button" class="btn btn-danger" id="delete-btn" onclick="deleteMatch()" style="display: none;">Delete Match</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Player Modal -->
+    <div id="add-player-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAddPlayerModal()">&times;</span>
+            <h2>Add New Player</h2>
+            <form id="add-player-form" onsubmit="createPlayer(event)">
+                <div class="form-group">
+                    <label for="new-player-name">Player Name *</label>
+                    <input type="text" id="new-player-name" required placeholder="Enter player name">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create Player</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddPlayerModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/match-form.js"></script>
+</body>
+</html>
+

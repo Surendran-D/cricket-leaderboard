@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Leaderboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏏 Cricket Leaderboard</h1>
+            <nav class="nav-buttons">
+                <button class="btn btn-primary" onclick="window.location.href='index.html'">Leaderboard</button>
+                <button class="btn btn-secondary" onclick="window.location.href='matches.html'">Matches</button>
+                <button class="btn btn-secondary" onclick="window.location.href='add-match.html'">Add Match</button>
+            </nav>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="batting">Batting Leaderboard</button>
+            <button class="tab-btn" data-tab="bowling">Bowling Leaderboard</button>
+        </div>
+
+        <div class="tab-content active" id="batting-tab">
+            <div class="leaderboard-header">
+                <h2>🏏 Batting Leaderboard</h2>
+                <div class="stats-info">
+                    <span>Points = Runs + (Fours × 1) + (Sixes × 2)</span>
+                </div>
+            </div>
+            <div id="batting-leaderboard" class="leaderboard-grid">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="bowling-tab">
+            <div class="leaderboard-header">
+                <h2>🎯 Bowling Leaderboard</h2>
+                <div class="stats-info">
+                    <span>Points = (Wickets × 10) + Economy Bonus</span>
+                </div>
+            </div>
+            <div id="bowling-leaderboard" class="leaderboard-grid">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
+
