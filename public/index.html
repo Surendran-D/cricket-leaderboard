@@ -47,6 +47,31 @@
         </div>
     </div>
 
+     <!-- Firebase SDK setup -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB1lbv_hK6qNNqgVyIpNM2yGLrAe_k_84A",
+        authDomain: "cricboard-807dd.firebaseapp.com",
+        projectId: "cricboard-807dd",
+        storageBucket: "cricboard-807dd.appspot.com",
+        messagingSenderId: "721333395680",
+        appId: "1:721333395680:web:4f86cd891cb86ea73ef085",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // Make Firestore accessible in other scripts
+      window.db = db;
+      window.addDoc = addDoc;
+      window.getDocs = getDocs;
+      window.collection = collection;
+    </script>
+
     <script src="js/main.js"></script>
 </body>
 </html>
