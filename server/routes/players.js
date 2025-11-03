@@ -117,9 +117,13 @@ router.post('/:id/image', upload.single('image'), async (req, res) => {
 			return res.status(404).json({ error: 'Player not found' });
 		}
 		
-		// Delete old image if exists
-		if (player.image_path && fs.existsSync(path.join(__dirname, '../', player.image_path))) {
-			fs.unlinkSync(path.join(__dirname, '../', player.image_path));
+		// Delete old image if exists (ensure absolute path resolves correctly)
+		if (player.image_path) {
+			const rel = player.image_path.replace(/^\/+/, ''); // remove leading slash
+			const absoluteOldPath = path.join(__dirname, '..', rel);
+			if (fs.existsSync(absoluteOldPath)) {
+				try { fs.unlinkSync(absoluteOldPath); } catch (_) {}
+			}
 		}
 		
 		const imagePath = `/uploads/${req.file.filename}`;
@@ -128,7 +132,7 @@ router.post('/:id/image', upload.single('image'), async (req, res) => {
 	} catch (error) {
 		// Delete uploaded file on error
 		if (req.file && fs.existsSync(req.file.path)) {
-			fs.unlinkSync(req.file.path);
+			try { fs.unlinkSync(req.file.path); } catch (_) {}
 		}
 		res.status(500).json({ error: error.message });
 	}
