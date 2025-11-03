@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadBattingLeaderboard() {
     try {
         const response = await fetch(`${API_BASE}/players/leaderboard/batting`);
-        const players = await response.json();
+        const data = await response.json();
+        const players = Array.isArray(data) ? data : [];
         displayBattingLeaderboard(players);
     } catch (error) {
         console.error('Error loading batting leaderboard:', error);
@@ -47,7 +48,8 @@ async function loadBattingLeaderboard() {
 async function loadBowlingLeaderboard() {
     try {
         const response = await fetch(`${API_BASE}/players/leaderboard/bowling`);
-        const players = await response.json();
+        const data = await response.json();
+        const players = Array.isArray(data) ? data : [];
         displayBowlingLeaderboard(players);
     } catch (error) {
         console.error('Error loading bowling leaderboard:', error);
@@ -59,7 +61,7 @@ async function loadBowlingLeaderboard() {
 function displayBattingLeaderboard(players) {
     const container = document.getElementById('batting-leaderboard');
     
-    if (players.length === 0) {
+    if (!Array.isArray(players) || players.length === 0) {
         container.innerHTML = '<div class="empty-state">No batting records yet. Add a match to get started!</div>';
         return;
     }
@@ -108,7 +110,7 @@ function displayBattingLeaderboard(players) {
 function displayBowlingLeaderboard(players) {
     const container = document.getElementById('bowling-leaderboard');
     
-    if (players.length === 0) {
+    if (!Array.isArray(players) || players.length === 0) {
         container.innerHTML = '<div class="empty-state">No bowling records yet. Add a match to get started!</div>';
         return;
     }
