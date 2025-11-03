@@ -36,7 +36,7 @@ async function initializeDatabase() {
 			await client.query(`
 				CREATE TABLE IF NOT EXISTS players (
 					id SERIAL PRIMARY KEY,
-					name TEXT NOT NULL,
+					name TEXT NOT NULL UNIQUE,
 					image_path TEXT,
 					created_at TIMESTAMPTZ DEFAULT NOW()
 				);
@@ -122,8 +122,12 @@ async function getPlayerById(id) {
 }
 
 async function createPlayer(name, imagePath = null) {
+	// Upsert by unique name to avoid duplicates
 	const { rows } = await pool.query(
-		'INSERT INTO players (name, image_path) VALUES ($1, $2) RETURNING id',
+		`INSERT INTO players (name, image_path)
+		 VALUES ($1, $2)
+		 ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+		 RETURNING id`,
 		[name, imagePath]
 	);
 	return { lastInsertRowid: rows[0].id };
@@ -315,9 +319,9 @@ async function getBattingLeaderboard() {
 			COALESCE(SUM(bs.sixes), 0) as total_sixes,
 			COUNT(DISTINCT bs.match_id) as matches_played
 		FROM players p
-		LEFT JOIN batting_stats bs ON p.id = bs.player_id
+		JOIN batting_stats bs ON p.id = bs.player_id
 		GROUP BY p.id, p.name, p.image_path
-		HAVING COALESCE(SUM(bs.points), 0) > 0 OR COUNT(DISTINCT bs.match_id) = 0
+		HAVING COUNT(DISTINCT bs.match_id) > 0
 		ORDER BY total_points DESC, total_runs DESC
 	`);
 	return rows;
@@ -335,9 +339,9 @@ async function getBowlingLeaderboard() {
 			COALESCE(SUM(bws.overs), 0) as total_overs,
 			COUNT(DISTINCT bws.match_id) as matches_played
 		FROM players p
-		LEFT JOIN bowling_stats bws ON p.id = bws.player_id
+		JOIN bowling_stats bws ON p.id = bws.player_id
 		GROUP BY p.id, p.name, p.image_path
-		HAVING COALESCE(SUM(bws.points), 0) > 0 OR COUNT(DISTINCT bws.match_id) = 0
+		HAVING COUNT(DISTINCT bws.match_id) > 0
 		ORDER BY total_points DESC, total_wickets DESC
 	`);
 	return rows;
