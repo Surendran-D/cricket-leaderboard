@@ -36,7 +36,7 @@ async function initializeDatabase() {
 			await client.query(`
 				CREATE TABLE IF NOT EXISTS players (
 					id SERIAL PRIMARY KEY,
-					name TEXT NOT NULL UNIQUE,
+					name TEXT NOT NULL,
 					image_path TEXT,
 					created_at TIMESTAMPTZ DEFAULT NOW()
 				);
@@ -60,8 +60,7 @@ async function initializeDatabase() {
 					balls_faced INTEGER DEFAULT 0,
 					fours INTEGER DEFAULT 0,
 					sixes INTEGER DEFAULT 0,
-					points INTEGER DEFAULT 0,
-					UNIQUE (match_id, player_id)
+					points INTEGER DEFAULT 0
 				);
 			`);
 
@@ -73,15 +72,18 @@ async function initializeDatabase() {
 					wickets INTEGER NOT NULL DEFAULT 0,
 					runs_conceded INTEGER DEFAULT 0,
 					overs NUMERIC(5,1) DEFAULT 0,
-					points INTEGER DEFAULT 0,
-					UNIQUE (match_id, player_id)
+					points INTEGER DEFAULT 0
 				);
 			`);
 
+			// Indexes and unique constraints (safe to run multiple times)
+			await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS ux_players_name ON players(name);`);
 			await client.query(`CREATE INDEX IF NOT EXISTS idx_batting_match ON batting_stats(match_id);`);
 			await client.query(`CREATE INDEX IF NOT EXISTS idx_batting_player ON batting_stats(player_id);`);
 			await client.query(`CREATE INDEX IF NOT EXISTS idx_bowling_match ON bowling_stats(match_id);`);
 			await client.query(`CREATE INDEX IF NOT EXISTS idx_bowling_player ON bowling_stats(player_id);`);
+			await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS ux_batting_match_player ON batting_stats(match_id, player_id);`);
+			await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS ux_bowling_match_player ON bowling_stats(match_id, player_id);`);
 
 			await client.query('COMMIT');
 		} catch (e) {
@@ -122,7 +124,6 @@ async function getPlayerById(id) {
 }
 
 async function createPlayer(name, imagePath = null) {
-	// Upsert by unique name to avoid duplicates
 	const { rows } = await pool.query(
 		`INSERT INTO players (name, image_path)
 		 VALUES ($1, $2)
