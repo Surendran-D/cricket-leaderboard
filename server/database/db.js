@@ -76,6 +76,63 @@ async function initializeDatabase() {
 				);
 			`);
 
+			// If duplicates exist in players.name, merge them before creating the unique index
+			// 1) Reassign batting stats from duplicate player ids to the kept id
+			await client.query(`
+				WITH d AS (
+					SELECT name, MIN(id) AS keep_id
+					FROM players
+					GROUP BY name
+					HAVING COUNT(*) > 1
+				), m AS (
+					SELECT p.id AS dup_id, d.keep_id
+					FROM players p
+					JOIN d ON p.name = d.name
+					WHERE p.id <> d.keep_id
+				)
+				UPDATE batting_stats bs
+				SET player_id = m.keep_id
+				FROM m
+				WHERE bs.player_id = m.dup_id;
+			`);
+
+			// 2) Reassign bowling stats from duplicate player ids to the kept id
+			await client.query(`
+				WITH d AS (
+					SELECT name, MIN(id) AS keep_id
+					FROM players
+					GROUP BY name
+					HAVING COUNT(*) > 1
+				), m AS (
+					SELECT p.id AS dup_id, d.keep_id
+					FROM players p
+					JOIN d ON p.name = d.name
+					WHERE p.id <> d.keep_id
+				)
+				UPDATE bowling_stats bs
+				SET player_id = m.keep_id
+				FROM m
+				WHERE bs.player_id = m.dup_id;
+			`);
+
+			// 3) Delete duplicate player rows, keeping the lowest id per name
+			await client.query(`
+				WITH d AS (
+					SELECT name, MIN(id) AS keep_id
+					FROM players
+					GROUP BY name
+					HAVING COUNT(*) > 1
+				), m AS (
+					SELECT p.id AS dup_id
+					FROM players p
+					JOIN d ON p.name = d.name
+					WHERE p.id <> d.keep_id
+				)
+				DELETE FROM players p
+				USING m
+				WHERE p.id = m.dup_id;
+			`);
+
 			// Indexes and unique constraints (safe to run multiple times)
 			await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS ux_players_name ON players(name);`);
 			await client.query(`CREATE INDEX IF NOT EXISTS idx_batting_match ON batting_stats(match_id);`);
