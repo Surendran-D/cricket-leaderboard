@@ -15,99 +15,104 @@ A web application to track and display cricket match statistics with batting and
 
 - **Frontend**: HTML, CSS, JavaScript (Vanilla)
 - **Backend**: Node.js with Express.js
-- **Database**: SQLite (better-sqlite3)
+- **Database**: PostgreSQL (via `pg`)
 - **File Upload**: Multer
 
-## Installation
+## Local Setup
 
 1. Install Node.js dependencies:
 ```bash
 npm install
 ```
 
-2. The database will be automatically created when you start the server.
+2. Create a `.env` file (for local dev):
+```bash
+DATABASE_URL=postgres://user:password@host:5432/dbname
+NODE_ENV=development
+PORT=3000
+```
 
 3. Start the server:
 ```bash
 npm start
 ```
 
-4. Open your browser and navigate to:
+4. Open your browser:
 ```
 http://localhost:3000
 ```
 
+The database schema is created automatically at startup.
+
+## Render Deployment
+
+1. Create a **PostgreSQL** database on Render (Free tier works)
+2. Copy the `Internal Database URL` (preferred) or `External Database URL`
+3. In your Web Service on Render, add Environment Variables:
+   - `DATABASE_URL` = your Postgres URL
+   - `NODE_ENV` = `production`
+   - `PORT` = `10000` (Render sets `PORT`; Node will pick it up, but setting is harmless)
+
+No persistent SQLite file is used; the app uses your Postgres database, so data survives restarts/redeploys.
+
 ## Usage
 
 ### Adding Players
-
-1. Go to "Add Match" page
-2. When adding batting/bowling stats, select a player
-3. If the player doesn't exist, you'll need to create them first via the API or add them when creating a match
+- Go to "Add Match" page
+- When adding batting/bowling stats, select a player
+- If the player doesn't exist, use the "Add New Player" button in the form
 
 ### Creating a Match
-
-1. Click "Add Match" button
+1. Click "Add Match"
 2. Enter match date and name
 3. Add batting stats for players (runs, balls, fours, sixes)
 4. Add bowling stats for players (wickets, runs conceded, overs)
-5. Click "Save Match"
+5. Save
 
 ### Viewing Leaderboards
-
-1. The main page displays batting leaderboard by default
-2. Click "Bowling Leaderboard" tab to view bowling stats
-3. Click on any player card to view their detailed statistics
-
-### Viewing Player Details
-
-1. Click on any player card from the leaderboard
-2. View their complete match history with batting and bowling stats
-3. See total statistics across all matches
+- Main page shows batting leaderboard
+- Switch to bowling tab for bowling stats
+- Click a player to view their history and upload a photo
 
 ### Editing/Deleting Matches
-
-1. Click on "Add Match" button
-2. Use URL parameter `?id=<match_id>` to edit an existing match
-3. Click "Delete Match" button to remove a match (this will also delete all associated stats)
+- Click "Matches" in the header to see all matches
+- Use ✏️ Edit or 🗑️ Delete actions
 
 ## API Endpoints
 
 ### Players
 - `GET /api/players` - Get all players
 - `GET /api/players/:id` - Get player with stats
-- `GET /api/players/leaderboard/batting` - Get batting leaderboard
-- `GET /api/players/leaderboard/bowling` - Get bowling leaderboard
-- `POST /api/players` - Create new player
+- `GET /api/players/leaderboard/batting` - Batting leaderboard
+- `GET /api/players/leaderboard/bowling` - Bowling leaderboard
+- `POST /api/players` - Create player
 - `POST /api/players/:id/image` - Upload player image
 
 ### Matches
 - `GET /api/matches` - Get all matches
-- `GET /api/matches/:id` - Get match details
-- `GET /api/matches/:id/stats` - Get match batting/bowling stats
-- `POST /api/matches` - Create new match
-- `PUT /api/matches/:id` - Update match
+- `GET /api/matches/:id` - Get match
+- `GET /api/matches/:id/stats` - Get match batting/bowling
+- `POST /api/matches` - Create match (with stats)
+- `PUT /api/matches/:id` - Update match (and stats)
 - `DELETE /api/matches/:id` - Delete match
 
 ## Points Calculation
 
 ### Batting Points
 - Base: 1 point per run
-- Fours: 1 bonus point per four
-- Sixes: 2 bonus points per six
+- Fours: +1 per four
+- Sixes: +2 per six
 - Formula: `Points = Runs + (Fours × 1) + (Sixes × 2)`
 
 ### Bowling Points
 - Base: 10 points per wicket
 - Economy Bonus:
-  - Economy < 4: +20 points
-  - Economy 4-6: +10 points
-  - Economy 6-8: +5 points
-  - Economy ≥ 8: No bonus
-- Formula: `Points = (Wickets × 10) + Economy Bonus`
+  - Economy < 4: +20
+  - Economy 4-6: +10
+  - Economy 6-8: +5
+  - Economy ≥ 8: +0
 
 ## Project Structure
-
 ```
 cricket-leaderboard-app/
 ├── server/
@@ -116,28 +121,29 @@ cricket-leaderboard-app/
 │   │   ├── players.js       # Player API routes
 │   │   └── matches.js       # Match API routes
 │   ├── database/
-│   │   └── db.js           # Database schema and queries
+│   │   └── db.js           # PostgreSQL pool, schema, and queries
 │   └── uploads/            # Player images
 ├── public/
-│   ├── index.html          # Main leaderboard page
-│   ├── add-match.html      # Add/edit match form
-│   ├── player-detail.html  # Player statistics page
+│   ├── index.html          # Leaderboard
+│   ├── matches.html        # Matches list (edit/delete)
+│   ├── add-match.html      # Add/edit match
+│   ├── player-detail.html  # Player statistics + image upload
 │   ├── css/
-│   │   └── style.css       # Stylesheet
+│   │   └── style.css
 │   ├── js/
 │   │   ├── main.js         # Leaderboard logic
+│   │   ├── matches.js      # Matches list logic
 │   │   ├── match-form.js   # Match CRUD logic
-│   │   └── player-detail.js # Player detail logic
+│   │   └── player-detail.js# Player detail + image upload
 │   └── images/
-│       └── default-avatar.png # Default player image
+│       └── default-avatar.svg
 ├── package.json
 └── README.md
 ```
 
 ## Notes
-
 - Player images are stored in `server/uploads/`
-- Database file is created as `server/cricket_leaderboard.db`
-- Default port is 3000 (change via PORT environment variable)
-- Image upload limit is 5MB per file
+- Database uses `DATABASE_URL`; schema auto-creates on startup
+- Default port is 3000 locally
+- Image upload limit is 5MB
 
